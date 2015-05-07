@@ -48,19 +48,24 @@ function record_click(){
         $details = array();
         $count = 0;
     }else{
-        $details = unserialize($details);
-        $count = $details[$day][$user]['count'];
+        //$details = unserialize($details);
+        $total = $details[$user]['total'];
+        $count = $details[$user][$day]['count'];
         if(!$count){
             $count = 0;
+        }
+        if(!total){
+            $total = 0;
         }
     }
 
     $count++;
 
     //$details[$day] = array();
-    $details[$day][$user]['count'] = $count;
+    $details[$user][$day]['count'] = $count;
+    $details[$user]['total'] = $total+1;
 
-    $update = update_post_meta($file_id, 'download-activity', serialize($details));
+    $update = update_post_meta($file_id, 'download-activity', $details);
 
     if($update){
         die(json_encode(array('success'=>1,'message'=>'Yeh... I think that went ok!', 'debug-in'=>$details, 'count'=>$count)));
@@ -91,10 +96,12 @@ function collect_data(){
     ));
 
     $content = array();
-
+    $i = 0;
     foreach($attachments as $item){
-        $content[$item->ID]['name'] = $item->post_title;
-        $content[$item->ID]['data'] = unserialize(get_post_meta($item->ID, 'download-activity', true));
+        $content[$i]['id'] = $item->ID;
+        $content[$i]['name'] = $item->post_title;
+        $content[$i]['data'] = get_post_meta($item->ID, 'download-activity');
+        $i++;
     }
 
     die(json_encode(array('success'=>1, 'message'=>'Retrieved Records', 'data'=>$content)));
