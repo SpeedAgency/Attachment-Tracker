@@ -14,6 +14,8 @@ function sp_at_create_menu(){
 
 function register_sp_at_settings(){
   register_setting('sp-at-settings', 'sp_at_api_key');
+  register_setting('sp-at-settings', 'sp_at_min');
+  register_setting('sp-at-settings', 'sp_at_mailto');
 }
 
 function sp_at_settings_page(){
@@ -21,12 +23,15 @@ function sp_at_settings_page(){
   wp_enqueue_style('sp-at-settings-style');
 
   $key = get_option('sp_at_api_key');
+  $min = get_option('sp_at_min', 5);
+  $mailto = get_option('sp_at_mailto', get_option('admin_email'));
   $saved = true;
 
   if(!$key){
     $key = generate_api_key();
     $saved = false;
   }
+
 
   ?>
   <div class="wrap">
@@ -47,6 +52,18 @@ function sp_at_settings_page(){
             <input type="text" id="sp_at_api_key" name="sp_at_api_key" value="<?php echo $key; ?>" />
           </div>
         </div>
+      </div>
+      <div class="form-row">
+          <label for="sp_at_min">Minimum downloads by an IP before triggering a notification email:</label>
+          <div class="input-wrap">
+              <input type="number" id="sp_at_min" name="sp_at_min" value="<?php echo $min; ?>" />
+          </div>
+      </div>
+      <div class="form-row">
+          <label for="sp_at_mailto">Email address to send notification emails to:</label>
+          <div class="input-wrap">
+              <input type="email" id="sp_at_mailto" name="sp_at_mailto" value="<?php echo $mailto; ?>" />
+          </div>
       </div>
      <?php submit_button(); ?>
   </form>
@@ -86,8 +103,8 @@ function sp_at_track_field($form_fields, $post){
 }
 
 function sp_at_track_field_save($post, $attachment){
-    $track = ($attachment['track'] == 'on') ? '1' : '0';
-    update_post_meta($post['ID'], 'track', $track);  
+    $track = ($attachment['track'] == '1') ? '1' : '0';
+    update_post_meta($post['ID'], 'track', $track);
     return $post;
 }
 

@@ -8,7 +8,8 @@ jQuery(function($){
         }
         $.post(ajaxurl, form_data, function(data){
             if(data['success']==1){
-                //location.href = url;
+                location.href = url;
+                //window.open(url, '_blank');
             }
         }, 'json');
         return false;
